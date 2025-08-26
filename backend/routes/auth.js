@@ -173,15 +173,17 @@ router.get('/me', auth, async (req, res) => {
 // @access  Private
 router.post('/logout', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
-    user.isOnline = false;
-    user.lastSeen = new Date();
-    await user.save();
+    const updated = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { isOnline: false, lastSeen: new Date() } },
+      { new: true, timestamps: false }
+    );
 
-    res.json({
-      success: true,
-      message: 'Logged out successfully'
-    });
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.json({ success: true, message: 'Logged out successfully' });
   } catch (error) {
     console.error('Logout error:', error);
     res.status(500).json({
