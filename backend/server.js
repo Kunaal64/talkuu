@@ -37,13 +37,24 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Connect to MongoDB
+// Connect to MongoDB with better configuration
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
+  socketTimeoutMS: 45000,
+  maxPoolSize: 10, // Maintain up to 10 socket connections
+  minPoolSize: 5, // Maintain minimum 5 socket connections
+  maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
 })
 .then(() => console.log('MongoDB connected successfully'))
-.catch(err => console.error('MongoDB connection error:', err));
+.catch(err => {
+  console.error('MongoDB connection error:', err);
+  console.error('Please check:');
+  console.error('1. Your internet connection');
+  console.error('2. MongoDB Atlas IP whitelist settings');
+  console.error('3. MongoDB URI in .env file');
+});
 
 // Socket.io for real-time messaging
 const activeUsers = new Map(); // userId -> socketId
