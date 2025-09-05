@@ -28,19 +28,30 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? [process.env.FRONTEND_URL || "https://talkuu.vercel.app"] 
+      ? [
+          process.env.FRONTEND_URL || "https://talkuu-lake.vercel.app",
+          "https://talkuu-lake.vercel.app",
+          "https://talkuu.vercel.app"
+        ] 
       : "http://localhost:3000",
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
 // Middleware
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
-    ? [process.env.FRONTEND_URL || "https://talkuu.vercel.app"]
+    ? [
+        process.env.FRONTEND_URL || "https://talkuu-lake.vercel.app",
+        "https://talkuu-lake.vercel.app",
+        "https://talkuu.vercel.app"
+      ]
     : ["http://localhost:3000"],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 };
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
